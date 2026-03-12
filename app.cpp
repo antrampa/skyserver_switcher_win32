@@ -11,6 +11,10 @@
 const std::string HOSTS_PATH = "C:\\Windows\\System32\\drivers\\etc\\hosts";
 // const std::string DOMAIN = "servsky";
 
+HWND btnOffice;
+HWND btnHome;
+HWND btnVPN;
+
 std::string GetIPFromConfig(const char* section)
 {
     char ip[100];
@@ -70,21 +74,35 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         case WM_CREATE:
 
-            CreateWindow("BUTTON","Working From Office",
+            btnOffice = CreateWindow("BUTTON","Working From Office",
                 WS_VISIBLE | WS_CHILD,
                 40,40,220,40,
                 hwnd,(HMENU)BTN_OFFICE,NULL,NULL);
 
-            CreateWindow("BUTTON","Working From Home (Hamachi)",
+            btnHome = CreateWindow("BUTTON","Working From Home (Hamachi)",
                 WS_VISIBLE | WS_CHILD,
                 40,100,220,40,
                 hwnd,(HMENU)BTN_HOME,NULL,NULL);
 
-            CreateWindow("BUTTON","Working with OpenVPN",
+            btnVPN = CreateWindow("BUTTON","Working with OpenVPN",
                 WS_VISIBLE | WS_CHILD,
                 40,160,220,40,
                 hwnd,(HMENU)BTN_VPN,NULL,NULL);
 
+        break;
+
+        case WM_SIZE:
+        {
+            int width = LOWORD(lParam);
+            int height = HIWORD(lParam);
+
+            int btnWidth = width - 80;
+            int btnHeight = 40;
+
+            MoveWindow(btnOffice, 40, 40, btnWidth, btnHeight, TRUE);
+            MoveWindow(btnHome,   40, 100, btnWidth, btnHeight, TRUE);
+            MoveWindow(btnVPN,    40, 160, btnWidth, btnHeight, TRUE);
+        }
         break;
 
         case WM_COMMAND:
@@ -129,7 +147,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
         0,
         CLASS_NAME,
         "ServSky Network Switcher",
-        WS_OVERLAPPEDWINDOW,
+        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
         CW_USEDEFAULT,CW_USEDEFAULT,320,280,
         NULL,
         NULL,
