@@ -9,7 +9,7 @@
 #define BTN_VPN    3
 
 const std::string HOSTS_PATH = "C:\\Windows\\System32\\drivers\\etc\\hosts";
-const std::string DOMAIN = "servsky";
+// const std::string DOMAIN = "servsky";
 
 std::string GetIPFromConfig(const char* section)
 {
@@ -18,7 +18,14 @@ std::string GetIPFromConfig(const char* section)
     return std::string(ip);
 }
 
-void UpdateHosts(std::string ip)
+std::string GetDomainFromConfig(const char* section)
+{
+    char domain[200];
+    GetPrivateProfileStringA(section, "dm", "", domain, 200, ".\\config.ini");
+    return std::string(domain);
+}
+
+void UpdateHosts(std::string ip, std::string domain)
 {
     std::ifstream in(HOSTS_PATH);
     std::vector<std::string> lines;
@@ -27,9 +34,9 @@ void UpdateHosts(std::string ip)
 
     while (getline(in, line))
     {
-        if (line.find(DOMAIN) != std::string::npos)
+        if (line.find(domain) != std::string::npos)
         {
-            lines.push_back(ip + " " + DOMAIN);
+            lines.push_back(ip + " " + domain);
             found = true;
         }
         else
@@ -42,7 +49,7 @@ void UpdateHosts(std::string ip)
 
     if (!found)
     {
-        lines.push_back(ip + " " + DOMAIN);
+        lines.push_back(ip + " " + domain);
     }
 
     std::ofstream out(HOSTS_PATH, std::ios::trunc);
@@ -85,15 +92,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             switch(LOWORD(wParam))
             {
                 case BTN_OFFICE:
-                    UpdateHosts(GetIPFromConfig("office"));
+                    UpdateHosts(GetIPFromConfig("office"), GetDomainFromConfig("domain"));
                 break;
 
                 case BTN_HOME:
-                    UpdateHosts(GetIPFromConfig("home"));
+                    UpdateHosts(GetIPFromConfig("home"), GetDomainFromConfig("domain"));
                 break;
 
                 case BTN_VPN:
-                    UpdateHosts(GetIPFromConfig("vpn"));
+                    UpdateHosts(GetIPFromConfig("vpn"), GetDomainFromConfig("domain"));
                 break;
             }
 
